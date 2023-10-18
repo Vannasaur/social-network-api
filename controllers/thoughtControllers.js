@@ -30,7 +30,18 @@ module.exports = {
     async createThought(req, res) {
         try {
             const createThought = await Thought.create(req.body);
-            res.json(createThought);
+            const addThoughtToUser = await User.findOneAndUpdate(
+                { username: req.body.username },
+                { $addToSet: { thoughts: createThought._id } },
+                { new: true },
+            )
+                .populate('thoughts')
+                .populate('friends')
+
+            if (!addThoughtToUser) {
+                return res.status(400).json({ message: 'Could not add thought to user' })
+            }
+            res.json(addThoughtToUser);
             console.log('Thought created successfully!')
         } catch (err) {
             console.log(err);
@@ -51,7 +62,7 @@ module.exports = {
                 .populate('reactions')
 
             if (!updateThought) {
-                res.status(404).json({ message: 'No thought with that id' });
+                return res.status(404).json({ message: 'No thought with that id' });
             }
 
             res.json(updateThought);
@@ -64,9 +75,17 @@ module.exports = {
     async deleteThought(req, res) {
         try {
             const deleteThought = await Thought.findOneAndDelete({ _id: req.params.thoughtId });
+            // remove thought from User
+            const deleteThoughtFromUser = await User.findOneAndUpdate(
+                { thoughts: req.params.thoughtId },
+                { $pull: { thoughts: req.params.thoughtId } },
+                { new: true }
+            )
+                .populate('thoughts')
+                .populate('friends')
 
             if (!deleteThought) {
-                res.status(404).json({ message: 'No thought with that id' });
+                return res.status(404).json({ message: 'No thought with that id' });
             }
 
             res.json(deleteThought);
@@ -84,11 +103,11 @@ module.exports = {
             const createReaction = await Thought.findOneAndUpdate(
                 filter,
                 update,
-                { new: true }
+                { runValidators: true, new: true }
             );
 
             if (!createReaction) {
-                res.status(400).json({ message: 'Reaction unable to be created'});
+                return res.status(400).json({ message: 'Reaction unable to be created' });
             }
 
             res.json(createReaction);
@@ -110,7 +129,7 @@ module.exports = {
             );
 
             if (!removeReaction) {
-                res.status(404).json({ message: 'No reaction with that ID'});
+                return res.status(404).json({ message: 'No reaction with that ID' });
             }
 
             res.json(removeReaction);
