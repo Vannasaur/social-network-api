@@ -49,7 +49,7 @@ Please also install the following programs:
 
 ## Usage
 
-In order to use this application, open up your terminal (on Mac) or Git Bash (on Windows). CD into the folder that contains the social network code. Once in the folder, type `npm i` (without the single quotations) in order to install the dependencies listed in the package.json. Once everything is installed, type in `npm run start` in order to start the server.
+In order to use this application, open up your terminal (on Mac) or Git Bash (on Windows). CD into the folder that contains the social network code. Once in the folder, type `npm i` in order to install the dependencies listed in the package.json. Once everything is installed, type in `npm run start` in order to start the server.
 
 Once your server is running, open up insomnia. Inside of insomnia, you can make get, post, put or delete requests to http://localhost:3001/api/users and http://localhost:3001/api/thoughts. Please refer to the route files to see which endpoints and routes are possible with the provided code. 
 
